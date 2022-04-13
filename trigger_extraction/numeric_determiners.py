@@ -21,7 +21,7 @@ class NumericDeterminerExtractor(PresuppositionExtractor):
 
     @staticmethod
     def get_trigger_name() -> str:
-        raise 'numeric_determiner'
+        return 'numeric_determiner'
 
     @staticmethod
     def get_trigger_canonical_example() -> str:

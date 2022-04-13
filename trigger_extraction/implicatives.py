@@ -21,7 +21,7 @@ class ImplicativeExtractor(PresuppositionExtractor):
 
     @staticmethod
     def get_trigger_name() -> str:
-        raise 'implicative'
+        return 'implicative'
 
     @staticmethod
     def get_trigger_canonical_example() -> str:

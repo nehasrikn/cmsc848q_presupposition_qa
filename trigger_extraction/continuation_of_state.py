@@ -20,7 +20,7 @@ class ContinuationOfStateExtractor(PresuppositionExtractor):
 
     @staticmethod
     def get_trigger_name() -> str:
-        raise 'continuation_of_state'
+        return 'continuation_of_state'
 
     @staticmethod
     def get_trigger_canonical_example() -> str:

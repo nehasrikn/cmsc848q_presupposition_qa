@@ -12,7 +12,7 @@ class ComparativeExtractor(PresuppositionExtractor):
 
     @staticmethod
     def get_trigger_name() -> str:
-        raise 'comparative'
+        return 'comparative'
 
     @staticmethod
     def get_trigger_canonical_example() -> str:

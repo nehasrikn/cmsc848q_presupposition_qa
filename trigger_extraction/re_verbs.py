@@ -19,7 +19,7 @@ class RePrefixedVerbExtractor(PresuppositionExtractor):
 
     @staticmethod
     def get_trigger_name() -> str:
-        raise 're_prefixed_verbs'
+        return 're_prefixed_verbs'
 
     @staticmethod
     def get_trigger_canonical_example() -> str:
