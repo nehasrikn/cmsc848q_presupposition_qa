@@ -33,7 +33,7 @@ class ChangeOfStateExtractor(PresuppositionExtractor):
         for token in sentence: 
             if (token.lemma_ in self.wordlist) and token.tag_[0] == "V" and token.dep_ == "ROOT":
                 return (True, [token])
-        return (False, None)
+        return (False, [])
 
     @staticmethod
     def presupposition_template() -> str:
