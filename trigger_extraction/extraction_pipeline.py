@@ -1,4 +1,5 @@
 import spacy
+import pprint
 from typing import List, Optional, Tuple, Dict
 
 from base_presupposition_extractor import PresuppositionExtractor
@@ -20,7 +21,7 @@ class PresuppositionExtractionPipeline:
 
 	def run(self, sentence: spacy.tokens.doc.Doc) -> Dict[str,  Tuple[bool, Optional[List[str]]]]:
 		return {
-			e.get_trigger_name(): e().find_trigger(nlp(sentence)) 
+			e.get_trigger_name(): e().find_trigger_instances(nlp(sentence)) 
 			for e in self.extractors
 		}
 
@@ -31,7 +32,7 @@ if __name__ == '__main__':
 
 	nlp = spacy.load("en_core_web_sm")
 
-	sentence = "He cried before he danced."
+	sentence = "I would have been happier if I had a dog"
 
 	extractors = [
 		ChangeOfStateExtractor, 
@@ -47,6 +48,7 @@ if __name__ == '__main__':
 
 	pipeline = PresuppositionExtractionPipeline(extractors=extractors)
 
-	print(pipeline.run(nlp(sentence)))
+	pp = pprint.PrettyPrinter(compact=True)
+	pp.pprint(pipeline.run(nlp(sentence)))
 
 	

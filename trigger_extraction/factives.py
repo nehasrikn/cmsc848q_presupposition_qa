@@ -1,6 +1,6 @@
 import spacy
 from utils import get_dependents_string
-from typing import List, Optional, Tuple
+from typing import List, Dict, Optional, Tuple
 from base_presupposition_extractor import PresuppositionExtractor
 
 
@@ -29,11 +29,12 @@ class FactiveExtractor(PresuppositionExtractor):
     def get_trigger_canonical_example() -> str:
         return "We will realize that global warming is important."
 
-    def find_trigger(self, sentence: spacy.tokens.doc.Doc) -> Tuple[bool, Optional[List[str]]]:
+    def find_trigger_instances(self, sentence: spacy.tokens.doc.Doc) -> Tuple[bool, List[Dict[str, str]]]:
         """
         Returns whether or not trigger is found in sentence and the token(s) that caused
         the method to fire.
         """
+        triggers = []
 
         def _check_sentence_for_quote(factive_verb):
             children = [t.text for t in factive_verb.children]
@@ -47,9 +48,12 @@ class FactiveExtractor(PresuppositionExtractor):
                 comp_children = [c for c in factive_verb.children if c.dep_ == "ccomp"]
                 if len(comp_children) > 0:
                     comp_clause = get_dependents_string(comp_children[0])
-                    return (True, [factive_verb, comp_clause])
+                    triggers.append({
+                        'factive_verb': str(factive_verb),
+                        'comp_clause': str(comp_clause)
+                    })
         
-        return (False, [])
+        return (True, triggers) if triggers else (False, [])
         
 
     @staticmethod
@@ -57,8 +61,18 @@ class FactiveExtractor(PresuppositionExtractor):
         raise NotImplementedError
 
     @staticmethod
-    def generate_presupposition(sentence: str) -> str:
-        raise NotImplementedError
+    def _presupposition_template_arguments(factive_verb: str, comp_clause: str) -> str:
+        return f'{comp_clause}'
+
+    def generate_presupposition(self, sentence: spacy.tokens.doc.Doc) -> List[str]:
+        presuppositions = []
+
+        trigger_fired, trigger_instances = self.find_trigger_instances(sentence)
+        if trigger_fired:
+            for d in trigger_instances:
+                presuppositions.append(FactiveExtractor._presupposition_template_arguments(**d))
+
+        return presuppositions
 
     @staticmethod
     def get_wordlist(wordlist_path: str) -> Optional[List[str]]:
@@ -70,6 +84,10 @@ if __name__ == '__main__':
     
     nlp = spacy.load("en_core_web_sm")
 
-    print(factive_extractor.find_trigger(
-        nlp(factive_extractor.get_trigger_canonical_example()))
-    )
+    example_sentences = [
+        factive_extractor.get_trigger_canonical_example(),
+    ]
+
+    for e in example_sentences:
+        print(factive_extractor.generate_presupposition(nlp(e)))
+

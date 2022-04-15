@@ -1,5 +1,5 @@
 import spacy
-from typing import List, Optional, Tuple
+from typing import List, Dict, Optional, Tuple
 from base_presupposition_extractor import PresuppositionExtractor
 
 
@@ -30,11 +30,14 @@ class TemporalAdverbExtractor(PresuppositionExtractor):
     def get_trigger_canonical_example() -> str:
         return "He took them to the NL Championship Series last year before being swept by the Atlanta Braves."
 
-    def find_trigger(self, sentence: spacy.tokens.doc.Doc) -> Tuple[bool, List[str]]:
+    def find_trigger_instances(self, sentence: spacy.tokens.doc.Doc) -> Tuple[bool, List[Dict[str, str]]]:
         """
         Returns whether or not trigger is found in sentence, and 
         preposition and embedded clause head tag if found.
         """
+
+        triggers = []
+
         words = [t.text for t in sentence]
         preps_in_sentence = [word for word in sentence if word.lemma_ in TemporalAdverbExtractor.TEMPORAL_PREPOSITIONS]
         if len(preps_in_sentence) > 0:
@@ -44,16 +47,30 @@ class TemporalAdverbExtractor(PresuppositionExtractor):
                 # check if tag is accepted (must be a verbal category)
                 accepted_prep_tags = list(set(prep_tags) & set(TemporalAdverbExtractor.ACCEPTED_HEAD_TAGS.keys()))
                 if len(prep_children) > 0 and len(accepted_prep_tags) > 0:
-                    return (True, [prep.text, prep_tags])
-        return (False, [])
+                    triggers.append({
+                        'temporal_preposition': prep.text,
+                        'tags': prep_tags
+                    })
+
+        return (True, triggers) if triggers else (False, [])
 
     @staticmethod
     def presupposition_template() -> str:
         raise NotImplementedError
 
     @staticmethod
-    def generate_presupposition(sentence: str) -> str:
-        raise NotImplementedError
+    def _presupposition_template_arguments(temporal_preposition: str, tags: List[str]) -> str:
+        return f'{temporal_preposition}'
+
+    def generate_presupposition(self, sentence: spacy.tokens.doc.Doc) -> List[str]:
+        presuppositions = []
+
+        trigger_fired, trigger_instances = self.find_trigger_instances(sentence)
+        if trigger_fired:
+            for d in trigger_instances:
+                presuppositions.append(TemporalAdverbExtractor._presupposition_template_arguments(**d))
+
+        return presuppositions
 
 
 if __name__ == '__main__':
@@ -61,7 +78,10 @@ if __name__ == '__main__':
     
     nlp = spacy.load("en_core_web_sm")
 
-    print(temporal_adverb_extractor.find_trigger(
-        nlp(temporal_adverb_extractor.get_trigger_canonical_example()))
-    )
+    example_sentences = [
+        temporal_adverb_extractor.get_trigger_canonical_example(),
+    ]
+
+    for e in example_sentences:
+        print(temporal_adverb_extractor.generate_presupposition(nlp(e)))
 

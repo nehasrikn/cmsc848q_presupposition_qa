@@ -1,5 +1,5 @@
 import spacy
-from typing import List, Optional, Tuple
+from typing import List, Dict, Optional, Tuple
 from base_presupposition_extractor import PresuppositionExtractor
 from utils import get_dependents_string
 
@@ -26,11 +26,13 @@ class EmbeddedQuestionExtractor(PresuppositionExtractor):
     def get_trigger_canonical_example() -> str:
         return "I fail to see how you could rationalize rewarding illegality."
 
-    def find_trigger(self, sentence: spacy.tokens.doc.Doc) -> Tuple[bool, List[str]]:
+    def find_trigger_instances(self, sentence: spacy.tokens.doc.Doc) -> Tuple[bool, List[Dict[str, str]]]:
         """
         Returns whether or not trigger is found in sentence, and
         preposition and embedded clause head tag if found.
         """
+        triggers = []
+
         def _check_sentence_for_quote(verb):
             children = [t.text for t in verb.children]
             return "\"" in children or "\'" in children
@@ -45,12 +47,18 @@ class EmbeddedQuestionExtractor(PresuppositionExtractor):
                 if len(ccomp_children) > 0:   # NOTE: You could exclude sentences with embedded clauses inside the complement clause, to make judgments simpler
                     for c in ccomp_children:  # is the embedded clause interrogative?
                         try:
-                            if next(c.children).text in EmbeddedQuestionExtractor.PRESUPPOSITIONAL_WH_WORDS:
+                            wh_word = next(c.children)
+                            if wh_word.text in EmbeddedQuestionExtractor.PRESUPPOSITIONAL_WH_WORDS:
                                 embedded_q = get_dependents_string(c)
-                                return (True, [wh_predicate, embedded_q])
+                                triggers.append({
+                                    'wh_word': str(wh_word),
+                                    'wh_predicate': str(wh_predicate),
+                                    'embedded_q': str(embedded_q)
+                                })
                         except Exception:
                             continue
-        return (False, [])
+        
+        return (True, triggers) if triggers else (False, [])
 
 
     @staticmethod
@@ -58,8 +66,18 @@ class EmbeddedQuestionExtractor(PresuppositionExtractor):
         raise NotImplementedError
 
     @staticmethod
-    def generate_presupposition(sentence: str) -> str:
-        raise NotImplementedError
+    def _presupposition_template_arguments(wh_word: str, wh_predicate: str, embedded_q: str) -> str:
+        return f'{embedded_q}'
+
+    def generate_presupposition(self, sentence: spacy.tokens.doc.Doc) -> List[str]:
+        presuppositions = []
+
+        trigger_fired, trigger_instances = self.find_trigger_instances(sentence)
+        if trigger_fired:
+            for d in trigger_instances:
+                presuppositions.append(EmbeddedQuestionExtractor._presupposition_template_arguments(**d))
+
+        return presuppositions
 
 
     @staticmethod
@@ -73,7 +91,13 @@ if __name__ == '__main__':
     
     nlp = spacy.load("en_core_web_sm")
 
-    print(embedded_question_extractor.find_trigger(
-        nlp("Which means , throw something up and you know exactly where it will fall to moon again."))
-    )
+    example_sentences = [
+        embedded_question_extractor.get_trigger_canonical_example(),
+        "when does jane find out who her father is",
+        "who knows where the time goes judy collins"
+    ]
+
+    for e in example_sentences:
+        print(embedded_question_extractor.generate_presupposition(nlp(e)))
+
 

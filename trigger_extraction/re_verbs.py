@@ -1,5 +1,5 @@
 import spacy
-from typing import List, Optional, Tuple
+from typing import List, Dict, Optional, Tuple
 from base_presupposition_extractor import PresuppositionExtractor
 
 
@@ -25,26 +25,42 @@ class RePrefixedVerbExtractor(PresuppositionExtractor):
     def get_trigger_canonical_example() -> str:
         return "Taoism reconnects aging to the great cycles of nature."
 
-    def find_trigger(self, sentence: spacy.tokens.doc.Doc) -> Tuple[bool, List[str]]:
+    def find_trigger_instances(self, sentence: spacy.tokens.doc.Doc) -> Tuple[bool, List[Dict[str, str]]]:
         """
         Returns whether or not trigger is found in sentence.
         """
+        triggers = []
+
         words = [t.text for t in sentence]
     
         if set(words) & set(self.wordlist):
             for token in sentence:
                 if (str(token) in self.wordlist and token.tag_[0] == "V" and token.dep_ == "ROOT"):
                     if len(list(token.children))  > 0: 
-                        return (True, [token]) 
-        return (False, [])
+                        triggers.append({
+                            're_verb': str(token)
+                        })
+        
+
+        return (True, triggers) if triggers else (False, [])
 
     @staticmethod
     def presupposition_template() -> str:
-        return "happened before"
+        raise NotImplementedError
 
     @staticmethod
-    def generate_presupposition(sentence: str) -> str:
-        raise NotImplementedError
+    def _presupposition_template_arguments(re_verb: str) -> str:
+        return f'{re_verb}'
+
+    def generate_presupposition(self, sentence: spacy.tokens.doc.Doc) -> List[str]:
+        presuppositions = []
+
+        trigger_fired, trigger_instances = self.find_trigger_instances(sentence)
+        if trigger_fired:
+            for d in trigger_instances:
+                presuppositions.append(RePrefixedVerbExtractor._presupposition_template_arguments(**d))
+
+        return presuppositions
 
     @staticmethod
     def get_wordlist(wordlist_path: str) -> List[str]:
@@ -57,7 +73,13 @@ if __name__ == '__main__':
     
     nlp = spacy.load("en_core_web_sm")
 
-    print(re_prefixed_verb_extractor.find_trigger(
-        nlp(re_prefixed_verb_extractor.get_trigger_canonical_example()))
-    )
+
+    example_sentences = [
+        re_prefixed_verb_extractor.get_trigger_canonical_example(),
+        "Kim finally resurfaces.",
+        "Six weeks after the Jenkins died, the hotel reopened Room 225."
+    ]
+
+    for e in example_sentences:
+        print(re_prefixed_verb_extractor.generate_presupposition(nlp(e)))
 
