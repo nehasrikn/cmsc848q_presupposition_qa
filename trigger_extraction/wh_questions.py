@@ -24,7 +24,7 @@ class WhoQuestionExtractor(PresuppositionExtractor):
             if token.tag_.startswith('WP') and str(token).lower() == 'who':
                 triggers.append({
                     'wh_word': str(token),
-                    'verb_phrase': " ".join(map(str, [str(t) for t in token.head.subtree if t != token]))
+                    'verb_phrase': " ".join(map(str, [str(t) for t in token.head.subtree if t != token and t.dep_ not in ('punct')]))
                 })
 
         return (True, triggers) if triggers else (False, [])
@@ -68,7 +68,7 @@ class WhatQuestionExtractor(PresuppositionExtractor):
             if token.tag_.startswith('WP') and str(token).lower() == 'what':
                 triggers.append({
                     'wh_word': str(token),
-                    'verb_phrase': " ".join(map(str, [str(t) for t in token.head.subtree if t != token]))
+                    'verb_phrase': " ".join(map(str, [str(t) for t in token.head.subtree if t != token and t.dep_ not in ('punct')]))
                 })
 
         return (True, triggers) if triggers else (False, [])
@@ -111,7 +111,7 @@ class WhenQuestionExtractor(PresuppositionExtractor):
             if token.tag_ == 'WRB' and str(token).lower() == 'when':
                 triggers.append({
                     'wh_word': str(token),
-                    'phrase': " ".join(map(str, [str(t) for t in token.head.subtree if t != token]))
+                    'phrase': " ".join(map(str, [str(t) for t in token.head.subtree if t != token and t.dep_ not in ('aux', 'punct')]))
                 })
 
         return (True, triggers) if triggers else (False, [])
@@ -197,7 +197,7 @@ class WhyQuestionExtractor(PresuppositionExtractor):
             if token.tag_ == 'WRB' and str(token).lower() == 'why':
                 triggers.append({
                     'wh_word': str(token),
-                    'phrase': " ".join(map(str, [str(t) for t in token.head.subtree if t != token and t.dep_ != 'aux']))
+                    'phrase': " ".join(map(str, [str(t) for t in token.head.subtree if t != token and t.dep_ not in ('aux', 'punct')]))
                 })
 
         return (True, triggers) if triggers else (False, [])
@@ -240,7 +240,7 @@ class HowQuestionExtractor(PresuppositionExtractor):
             if token.tag_ == 'WRB' and str(token).lower() == 'how':
                 triggers.append({
                     'wh_word': str(token),
-                    'phrase': " ".join(map(str, [str(t) for t in token.head.subtree if t != token and t.dep_ != 'aux']))
+                    'phrase': " ".join(map(str, [str(t) for t in token.head.subtree if t != token and t.dep_ not in ('aux', 'punct')]))
                 })
 
         return (True, triggers) if triggers else (False, [])
@@ -282,7 +282,7 @@ class WhichQuestionExtractor(PresuppositionExtractor):
             if token.tag_ == 'WDT' and str(token).lower() == 'which':
                 triggers.append({
                     'wh_word': str(token),
-                    'phrase': " ".join(map(str, [str(t) for t in token.head.head.subtree if t != token]))
+                    'phrase': " ".join(map(str, [str(t) for t in token.head.head.subtree if t != token and t.dep_ not in ('punct')]))
                 })
 
         return (True, triggers) if triggers else (False, [])
