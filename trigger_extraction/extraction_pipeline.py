@@ -6,12 +6,23 @@ from base_presupposition_extractor import PresuppositionExtractor
 from change_of_state import ChangeOfStateExtractor
 from comparatives import ComparativeExtractor
 from continuation_of_state import ContinuationOfStateExtractor
+from definite_articles import DefiniteArticleExtractor
 from embedded_questions import EmbeddedQuestionExtractor
 from factives import FactiveExtractor
 from implicatives import ImplicativeExtractor
 from numeric_determiners import NumericDeterminerExtractor
+from possessives import PossessiveExtractor
 from re_verbs import RePrefixedVerbExtractor
 from temporal_adverbs import TemporalAdverbExtractor
+from wh_questions import (
+	WhoQuestionExtractor, 
+	WhatQuestionExtractor, 
+	WhenQuestionExtractor, 
+	WhereQuestionExtractor, 
+	WhyQuestionExtractor, 
+	HowQuestionExtractor, 
+	WhichQuestionExtractor
+)
 
 class PresuppositionExtractionPipeline:
 
@@ -21,7 +32,7 @@ class PresuppositionExtractionPipeline:
 
 	def run(self, sentence: spacy.tokens.doc.Doc) -> Dict[str,  Tuple[bool, Optional[List[str]]]]:
 		return {
-			e.get_trigger_name(): e().find_trigger_instances(nlp(sentence)) 
+			e.get_trigger_name(): (e().find_trigger_instances(nlp(sentence)), e().generate_presupposition(nlp(sentence)))
 			for e in self.extractors
 		}
 
@@ -32,23 +43,32 @@ if __name__ == '__main__':
 
 	nlp = spacy.load("en_core_web_sm")
 
-	sentence = "I would have been happier if I had a dog"
+	sentence = "who recommends sun exposure at your child's checkup?"
 
 	extractors = [
 		ChangeOfStateExtractor, 
 		ComparativeExtractor, 
 		ContinuationOfStateExtractor,
+		DefiniteArticleExtractor,
 		EmbeddedQuestionExtractor,
 		FactiveExtractor,
 		ImplicativeExtractor,
 		NumericDeterminerExtractor,
 		RePrefixedVerbExtractor,
-		TemporalAdverbExtractor
+		TemporalAdverbExtractor,
+		WhoQuestionExtractor, 
+		WhatQuestionExtractor, 
+		WhenQuestionExtractor, 
+		WhereQuestionExtractor, 
+		WhyQuestionExtractor, 
+		HowQuestionExtractor, 
+		WhichQuestionExtractor
 	]
 
 	pipeline = PresuppositionExtractionPipeline(extractors=extractors)
 
 	pp = pprint.PrettyPrinter(compact=True)
+	print(sentence)
 	pp.pprint(pipeline.run(nlp(sentence)))
 
 	
