@@ -1,0 +1,3 @@
+[submodule "cmsc848q_presupposition_paper"]
+	path = cmsc848q_presupposition_paper
+	url = git@github.com:nehasrikn/cmsc848q_presupposition_paper.git
