@@ -6,6 +6,7 @@ from base_presupposition_extractor import PresuppositionExtractor
 from change_of_state import ChangeOfStateExtractor
 from comparatives import ComparativeExtractor
 from continuation_of_state import ContinuationOfStateExtractor
+from counterfactuals import CounterfactualExtractor
 from definite_articles import DefiniteArticleExtractor
 from embedded_questions import EmbeddedQuestionExtractor
 from factives import FactiveExtractor
@@ -43,12 +44,13 @@ if __name__ == '__main__':
 
 	nlp = spacy.load("en_core_web_sm")
 
-	sentence = "who recommends sun exposure at your child's checkup?"
+	sentence = "I was walking when the murderer escaped from prison."
 
 	extractors = [
 		ChangeOfStateExtractor, 
 		ComparativeExtractor, 
 		ContinuationOfStateExtractor,
+		CounterfactualExtractor,
 		DefiniteArticleExtractor,
 		EmbeddedQuestionExtractor,
 		FactiveExtractor,

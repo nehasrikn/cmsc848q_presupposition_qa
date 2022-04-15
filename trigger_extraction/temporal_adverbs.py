@@ -10,9 +10,11 @@ class TemporalAdverbExtractor(PresuppositionExtractor):
     Tom's cat after she washed her hands" presupposes that "Lisa washed her hands". 
     Extracted sentences contain adverbial clauses headed by "after", "since", "before",
     "because", and "while".
+
+    TODO: Are all adjuncts covered from Kim et al?
     """
 
-    TEMPORAL_PREPOSITIONS = ['before', 'after', 'while', 'since', 'because']
+    TEMPORAL_PREPOSITIONS = ['before', 'after', 'while', 'since', 'because', 'during']
     ACCEPTED_HEAD_TAGS = {
         'VBG': 'gerund',
         'VBN': 'past-participle',
