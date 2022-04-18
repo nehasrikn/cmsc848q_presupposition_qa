@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
 	nlp = spacy.load("en_core_web_sm")
 
-	sentence = "I was walking when the murderer escaped from prison."
+	sentence = "which linguist invented grass"
 
 	extractors = [
 		ChangeOfStateExtractor, 
