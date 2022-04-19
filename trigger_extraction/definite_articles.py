@@ -46,7 +46,7 @@ class DefiniteArticleExtractor(PresuppositionExtractor):
         trigger_fired, trigger_instances = self.find_trigger_instances(sentence)
         if trigger_fired:
             for d in trigger_instances:
-                presuppositions.append(DefiniteArticleExtractor._presupposition_template_arguments(**d))
+                presuppositions.extend(DefiniteArticleExtractor._presupposition_template_arguments(**d))
 
         return presuppositions
 
