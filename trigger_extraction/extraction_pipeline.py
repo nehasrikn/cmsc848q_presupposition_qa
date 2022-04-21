@@ -123,8 +123,7 @@ if __name__ == '__main__':
     sentence = args.sent 
     print(f"Sentence : {sentence}\n")
     a = pipeline.run(nlp(sentence))
-    #print(a[0])
-    #print(a[0].trigger_name)
+    
     presups = pipeline.run(nlp(sentence))
     for presup in presups: 
         print(f"Trigger type: {presup.trigger_name}\tExtracted presup: {presup}")
