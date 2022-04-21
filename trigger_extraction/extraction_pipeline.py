@@ -1,5 +1,6 @@
 import spacy
 import pprint
+import argparse 
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Dict
 
@@ -59,7 +60,6 @@ class Presupposition:
     def __repr__(self):
       return self.template_presupposition
 
-
 class PresuppositionExtractionResult:
 
     #TODO: Custom iter function
@@ -80,7 +80,7 @@ class PresuppositionExtractionResult:
                         metadata=p,
                         template_presupposition=v[2][i],
                         annotated_presupposition=None
-                    ))
+                    )) 
         return presuppositions
 
     def __len__(self):
@@ -97,21 +97,36 @@ class PresuppositionExtractionPipeline:
             e.get_trigger_name(): (*e().find_trigger_instances(sentence), e().generate_presupposition(sentence))
             for e in self.extractors
         }
-        return PresuppositionExtractionResult(result)
+        return PresuppositionExtractionResult.parse_presup_dict(result)
 
     def get_components(self) -> List[str]:
         return [e.get_trigger_name() for e in self.extractors]
 
 if __name__ == '__main__':
+    """
+    Usage: 
 
-    nlp = spacy.load("en_core_web_sm")
+    python extraction_pipeline.py -s "When did the leaning tower of pisa start leaning?"
+    """
+
+
 
     sentence = "which linguist invented grass"
+    parser = argparse.ArgumentParser(description="Try out the presupposition extraction on a sentence")
+    parser.add_argument('-s', '--sentence', dest='sent', type=str, help="Enter the sentence to be parsed", default=sentence)
+    nlp = spacy.load("en_core_web_sm")
 
     pipeline = PresuppositionExtractionPipeline(extractors=EXTRACTORS)
-
     pp = pprint.PrettyPrinter(compact=True)
-    print(sentence)
-    pp.pprint(pipeline.run(nlp(sentence)))
+    
+    args = parser.parse_args()
+    sentence = args.sent 
+    print(f"Sentence : {sentence}\n")
+    a = pipeline.run(nlp(sentence))
+    #print(a[0])
+    #print(a[0].trigger_name)
+    presups = pipeline.run(nlp(sentence))
+    for presup in presups: 
+        print(f"Trigger type: {presup.trigger_name}\tExtracted presup: {presup}")
 
     
