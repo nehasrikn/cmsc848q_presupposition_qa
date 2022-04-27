@@ -1,7 +1,10 @@
 # Instructions for Usage in CMSC848Q Pipeline
 Download contextualizer into this directory and run `tar -xzvf {downloaded tar}`
+
 Rename the folder using `mv question_transformation_grammar_corrected_who/ contextualizer/`
+
 Modify variables as instructed in `qgen-pipeline.sh`
+
 Run `bash qgen-pipeline.sh`
 
 
