@@ -1,11 +1,9 @@
 # Instructions for Usage in CMSC848Q Pipeline
-Download contextualizer into this directory and run `tar -xzvf {downloaded tar}`
-
-Rename the folder using `mv question_transformation_grammar_corrected_who/ contextualizer/`
-
-Modify variables as instructed in `qgen-pipeline.sh`
-
-Run `bash qgen-pipeline.sh`
+1. Create python virtualenv and run `pip install -r requirements.txt` inside the venv
+2. Download contextualizer into this directory and run `tar -xzvf {downloaded tar}`
+3. Rename the folder using `mv question_transformation_grammar_corrected_who/ contextualizer/`
+4. Modify variables as instructed in `qgen-pipeline.sh`
+5. Run `bash qgen-pipeline.sh`
 
 
 # Role Questions
