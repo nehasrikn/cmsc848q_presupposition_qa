@@ -52,6 +52,7 @@ EXTRACTORS = [
 @dataclass
 class Presupposition:
     """Represent an extracted presupposition"""
+    sentence: str
     trigger_name: str
     metadata: Dict[str, str]
     template_presupposition: str
@@ -70,12 +71,13 @@ class PresuppositionExtractionResult:
         self.fired_triggers = [k for k, v in self.raw_presuppositions.items( ) if v[0]]
 
     @staticmethod
-    def parse_presup_dict(presup_dict: Dict[str, Tuple[bool, List[Dict[str, str]], str]]) -> List[Presupposition]:
+    def parse_presup_dict(sentence: str, presup_dict: Dict[str, Tuple[bool, List[Dict[str, str]], str]]) -> List[Presupposition]:
         presuppositions = []
         for k, v in presup_dict.items():
             if v[0]: # trigger fired
                 for i, p in enumerate(v[1]):
                     presuppositions.append(Presupposition(
+                        sentence=sentence,
                         trigger_name=k,
                         metadata=p,
                         template_presupposition=v[2][i],
@@ -97,7 +99,7 @@ class PresuppositionExtractionPipeline:
             e.get_trigger_name(): (*e().find_trigger_instances(sentence), e().generate_presupposition(sentence))
             for e in self.extractors
         }
-        return PresuppositionExtractionResult.parse_presup_dict(result)
+        return PresuppositionExtractionResult.parse_presup_dict(str(sentence), result)
 
     def get_components(self) -> List[str]:
         return [e.get_trigger_name() for e in self.extractors]
@@ -105,11 +107,8 @@ class PresuppositionExtractionPipeline:
 if __name__ == '__main__':
     """
     Usage: 
-
     python extraction_pipeline.py -s "When did the leaning tower of pisa start leaning?"
     """
-
-
 
     sentence = "which linguist invented grass"
     parser = argparse.ArgumentParser(description="Try out the presupposition extraction on a sentence")

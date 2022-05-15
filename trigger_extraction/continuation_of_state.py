@@ -39,8 +39,9 @@ class ContinuationOfStateExtractor(PresuppositionExtractor):
                 if (str(token)) in self.wordlist and token.tag_[0] == "V" and token.dep_ == "ROOT": 
                     for child in token.children: 
                         if child.dep_ in ["xcomp", "ccomp"]:
+                            subject = [c for c in token.children if 'subj' in c.dep_]
                             triggers.append({
-                                'subject': str([c for c in token.children if 'subj' in c.dep_][0]),
+                                'subject': str(subject[0]) if subject else None,
                                 'continuation_of_state_predicate': str(token),
                                 'modified_phrase': " ".join(map(str, list(child.subtree)))
                             }) 
