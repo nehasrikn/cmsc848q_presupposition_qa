@@ -75,7 +75,7 @@ class PresuppositionExtractionResult:
         presuppositions = []
         for k, v in presup_dict.items():
             if v[0]: # trigger fired
-                for i, p in enumerate(v[1]):
+                for i, p in enumerate(v[2]):
                     presuppositions.append(Presupposition(
                         sentence=sentence,
                         trigger_name=k,
@@ -121,9 +121,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     sentence = args.sent 
     print(f"Sentence : {sentence}\n")
-    a = pipeline.run(nlp(sentence))
     
     presups = pipeline.run(nlp(sentence))
+    print(presups)
     for presup in presups: 
         print(f"Trigger type: {presup.trigger_name}\tExtracted presup: {presup}")
 

@@ -60,8 +60,8 @@ if __name__ == '__main__':
         definite_article_extractor.get_trigger_canonical_example(),
         "which is the nearest country north of egypt",
         "who sings the best version of we wish you a merry christmas",
-        "what are the four countries with a higher spanish-speaking population than the USA"
-
+        "what are the four countries with a higher spanish-speaking population than the USA",
+        "when will the curse be broken in once upon a time season 7",
     ]
 
     for e in example_sentences:
