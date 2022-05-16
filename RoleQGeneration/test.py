@@ -64,7 +64,13 @@ samples = [{
             "proto_question": "what is something's something?",
                 "predicate_lemma": "is",
                     "predicate_span": "1:2"
-}, 
+},
+{
+        "text": "does the 21 Pilots have a tenth album?",
+            "proto_question": "what has something?",
+                "predicate_lemma": "have",
+                    "predicate_span": "4:5"
+},
 {
         "text": "does the 21 Pilots have a tenth album?",
             "proto_question": "what does something have?",
