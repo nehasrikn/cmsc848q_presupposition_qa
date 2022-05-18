@@ -1,0 +1,9 @@
+/data/
+/checkpoint/
+outputs/
+output/
+
+__pycache__
+
+*.bin
+

@@ -1,0 +1,5 @@
+torch
+fever-scorer
+transformers
+pytorch-pretrained-bert
+prettytable
