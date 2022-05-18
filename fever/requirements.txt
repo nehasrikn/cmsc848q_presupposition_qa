@@ -1,0 +1,13 @@
+allennlp==0.8.1
+overrides==3.1.0
+tensorflow-gpu==2.6.2
+scikit-learn==0.22.2
+fever-drqa
+Cython==0.28.5
+pyfasttext==0.4.5
+wikipedia
+transformers==4.18.0
+tensorboard==2.6.0
+tensorboardX==1.8
+pytorch-transformers==1.1.0
+pandas
