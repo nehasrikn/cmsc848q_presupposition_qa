@@ -1,86 +1,72 @@
-# Kernel Graph Attention Network (KGAT)
-There are source codes for [Fine-grained Fact Verification with Kernel Graph Attention Network](https://www.aclweb.org/anthology/2020.acl-main.655.pdf).
+## FEVER: Sentence Selection and NLI (KGAT)
 
-![model](https://github.com/thunlp/KernelGAT/blob/master/model.png)
+### Sentence Selection
+#### Input
+- Description: Candidate sentences from Document Retrieval  
+- Location: {data_dir}/output/docs/{prefix}.sent.7.jsonl  
+- Example 
 
-For more information about the FEVER 1.0 shared task can be found on this [website](http://fever.ai).
+> {"id": 0, "claim": "", "evidence":[[page_title_1, sent_num, evidence_string], [page_title_1, sent_num, evidence_string], ...]
 
-## 😃 What's New
-[Fact Extraction and Verification with SCIFACT](https://scifact.apps.allenai.org)
+The evidence set contains the a 3 element array for each evidence sentence of the form [page_title, sent_num, evidence_string]
 
-The shared task introduces scientific claim verification for helping scientists, clinicians, and public to verify the credibility of such claims with scientific literature, especially for the claims related to COVID-19. \
-  [>> Reproduce Our Results](./scikgat) [>> About SCIFACT Dataset](https://www.aclweb.org/anthology/2020.emnlp-main.609.pdf) [>> Our Paper](https://www.aclweb.org/anthology/2020.findings-emnlp.216)
-
-
-## Requirement
-* Python 3.X
-* fever_score
-* Pytorch
-* pytorch_pretrained_bert
-* transformers
+- page_title: Title of wikipedia page
+- sent_num: The position of sentence in the respective wikipedia page
+- evidence_string: Evidence text
 
 
-## Data and Checkpoint
-* All data and BERT based chechpoints can be found at [Ali Drive](https://thunlp.oss-cn-qingdao.aliyuncs.com/KernelGAT/FEVER/KernelGAT.zip).
-* RoBERTa based models and chechpoints can be found at [Ali Drive](https://thunlp.oss-cn-qingdao.aliyuncs.com/KernelGAT/FEVER/KernelGAT_roberta_large.zip).
+#### Run Instructions
 
-## Retrieval Model
-* BERT based ranker.
-* Go to the ``retrieval_model`` folder for more information.
-
-
-## Pretrain Model
-* Pre-train BERT with claim-evidence pairs.
-* Go to the ``pretrain`` folder for more information.
-
-
-## KGAT Model
-* Our KGAT model.
-* Go to the ``kgat`` folder for more information.
-
-
-## Results
-The results are all on [Codalab leaderboard](https://competitions.codalab.org/competitions/18814#results).
-
-
-| User | Pre-train Model| Label Accuracy| FEVER Score |
-| -------- | -------- | --------  | --------  |
-[GEAR_single](https://arxiv.org/pdf/1908.01843.pdf)|BERT \(Base\)|0\.7160|0\.6710|
-|[a.soleimani.b](https://arxiv.org/pdf/1910.02655.pdf)|BERT \(Large\)|0\.7186|0\.6966 |
-|KGAT |RoBERTa \(Large\)|0\.7407|0\.7038|
-
-
-KGAT performance with different pre-trained language model.
-
-| Pre-train Model| Label Accuracy| FEVER Score |
-| --------  | -------- | -------- |
-|BERT \(Base\)|0\.7281|0\.6940|
-|BERT \(Large\)|0\.7361|0\.7024|
-|RoBERTa \(Large\)|0\.7407|0\.7038|
-|[CorefBERT](https://arxiv.org/abs/2004.06870) \(RoBERT Large\)|0\.7596|0\.7230|
-
-
-
-
-## Citation
 ```
-@inproceedings{liu2020kernel,
-  title={Fine-grained Fact Verification with Kernel Graph Attention Network},
-  author={Liu, Zhenghao and Xiong, Chenyan and Sun, Maosong and Liu, Zhiyuan},
-  booktitle={Proceedings of ACL},
-  year={2020}
-}
+export prefix='tmp'
+cd kgat/retrieval_model
+
+python test.py --outdir ./output/ --test_path /fs/clip-scratch/navita/cmsc848Q/output/docs/$prefix.sent.7.jsonl --bert_pretrain ../bert_base --checkpoint ../checkpoint/retrieval_model/model.best.pt --name $prefix.json
+
+python process_data.py --retrieval_file ./output/$prefix.json --gold_file /fs/clip-scratch/navita/cmsc848Q/output/docs/$prefix.sent.7.jsonl  --output ./output/bert_$prefix.json --test
+
 ```
+
+#### Output
+Sentence selection returns 5 evidence per claim
+
+[test.py](/fever/kgat/retrieval_model/test.py)
+- Location: ./output/{prefix}.json file  
+- Example
+> {id: 0, evidence: [[page_title, sent_num, evidence_string, 0, evidence_score], [page_num, sent_num, evidence_string, 0, evidence_score], ..]}
+
+- The evidence set contains list of 5 evidence per claim   
+- evidence_score: Weight of the respective evidence piece (between -1 to  1)
+
+> **_NOTE:_** The 0 in the evidence set is spurious
+
+[process_data.py](/fever/kgat/retrieval_model/process_data.py) 
+- Location: ./output/bert_{prefix}.json file  
+- Example 
+
+> {id: 0, claim: "", evidence:[[page_title, sent_num, evidence_string, 0, evidence_score], ...]}
+
+
+
+
+### NLI
+#### Input
+- The output of [process_data.py](/fever/kgat/retrieval_model/process_data.py) as described above
+
+#### Run Instructions
+
 ```
-@inproceedings{liu2020adapting,
-    title = {Adapting Open Domain Fact Extraction and Verification to COVID-FACT through In-Domain Language Modeling},
-    author = {Liu, Zhenghao and Xiong, Chenyan and Dai, Zhuyun and Sun, Si and Sun, Maosong and Liu, Zhiyuan},
-    booktitle = {Findings of the Association for Computational Linguistics: EMNLP 2020},
-   year={2020}
-}
+export prefix='tmp'
+cd kgat/kgat
+
+python test.py --outdir ./output/ --test_path ../retrieval_model/output/bert_$prefix.json --bert_pretrain ../bert_base --checkpoint ../checkpoint/kgat/model.best.pt --name $prefix.json
 ```
-## Contact
-If you have questions, suggestions and bug reports, please email:
-```
-liuzhenghao0819@gmail.com
-```
+
+#### Output 
+- Location: ./output/{prefix}.json  
+- Example
+
+> {id: 0, predicted_label: "SUPPORTS"}
+
+Predicted label: The NLI label ["SUPPORTS", "REFUTES", "NOT ENOUGH INFO"]
+

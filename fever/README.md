@@ -1,7 +1,7 @@
 ### FEVER
 
-- Document Retreival (ATHENE): [doc_ret](fever/doc_ret)  
-- Sentence Selection + NLI (KGAT): [kgat](fever/kgat)
+- Document Retreival (ATHENE): [doc_ret](/fever/doc_ret)  
+- Sentence Selection + NLI (KGAT): [kgat](/fever/kgat)
 
 
 ### Setup Instruction
