@@ -13,7 +13,7 @@ class PossessiveExtractor(PresuppositionExtractor):
 
     @staticmethod
     def get_trigger_canonical_example() -> str:
-        return "what was the relationship between japan’s emperors and military leaders?"
+        return "what was the relationship between japan's emperors and military leaders?"
 
     def find_trigger_instances(self, sentence: spacy.tokens.doc.Doc) -> Tuple[bool, List[Dict[str, str]]]:
         """

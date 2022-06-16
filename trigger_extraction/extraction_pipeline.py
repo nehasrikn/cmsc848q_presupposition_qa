@@ -38,6 +38,7 @@ EXTRACTORS = [
     FactiveExtractor,
     ImplicativeExtractor,
     NumericDeterminerExtractor,
+    PossessiveExtractor,
     RePrefixedVerbExtractor,
     TemporalAdverbExtractor,
     WhoQuestionExtractor, 
